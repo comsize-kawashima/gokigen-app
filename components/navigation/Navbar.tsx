@@ -6,10 +6,12 @@ const Navbar: React.FC = () => {
     <header className="bg-emerald-500 p-4 text-white">
       <div className="container mx-auto flex justify-between items-center">
         <h1
-          className="text-2xl md:text-4xl font-bold text-white drop-shadow-lg"
-          style={{ fontFamily: "'Mochiy Pop One', sans-serif" }}
+          className="text-3xl md:text-5xl font-bold text-white drop-shadow-lg"
+          style={{ fontFamily: "'Nico Moji', sans-serif" }}
         >
-          <Link href="/">ゴキゲンアプリ</Link>
+          <Link href="/" onClick={() => window.location.reload()}>
+            ゴキゲンアプリ
+          </Link>
         </h1>
         <nav>
           <ul className="flex space-x-2 md:space-x-4">
@@ -36,4 +38,4 @@ const Navbar: React.FC = () => {
   );
 };
 
-export default Navbar; 
+export default Navbar;
