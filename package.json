@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@prisma/client": "^6.7.0",
     "@supabase/supabase-js": "^2.49.4",
     "axios": "^0.21.4",
     "next": "^15.3.1",
@@ -11,6 +12,7 @@
   "devDependencies": {
     "@types/node": "22.15.2",
     "@types/react": "19.1.2",
+    "prisma": "^6.7.0",
     "typescript": "5.8.3"
   }
 }
