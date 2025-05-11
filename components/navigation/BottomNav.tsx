@@ -38,7 +38,7 @@ const BottomNav: React.FC = () => {
       )
     },
     {
-      path: '/stats',
+      path: '/analysis',
       label: '分析',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

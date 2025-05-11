@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import MoodCalendar from '@/components/mood/MoodCalendar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/router';
 import Layout from '@/components/layout/Layout';
 import BottomNav from '@/components/navigation/BottomNav';
+import MoodAnalysis from '@/components/analysis/MoodAnalysis';
 
-const Home: React.FC = () => {
+const Analysis: React.FC = () => {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [moodData, setMoodData] = useState<{ [key: string]: number }>({});
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   useEffect(() => {
     if (!loading && !user) {
@@ -54,18 +53,13 @@ const Home: React.FC = () => {
   }
 
   return (
-    <Layout title="ホーム | ゴキゲンアプリ">
-      <div className="max-w-md mx-auto px-4 py-6 pb-24">
-        <MoodCalendar
-          moodData={moodData}
-          setMoodData={setMoodData}
-          selectedDate={selectedDate}
-          onDateChange={setSelectedDate}
-        />
+    <Layout title="分析 | ゴキゲンアプリ">
+      <div className="max-w-4xl mx-auto px-4 py-6 pb-24">
+        <MoodAnalysis moodData={moodData} />
         <BottomNav />
       </div>
     </Layout>
   );
 };
 
-export default Home;
+export default Analysis; 
