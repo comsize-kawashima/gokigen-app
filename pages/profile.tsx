@@ -23,7 +23,7 @@ const Profile = () => {
         } else {
           setError(data.error || "ユーザー情報の取得に失敗しました");
         }
-      } catch (e) {
+      } catch {
         setError("ユーザー情報の取得に失敗しました");
       }
     };

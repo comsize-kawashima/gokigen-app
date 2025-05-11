@@ -77,7 +77,7 @@ const MoodAnalysis: React.FC<MoodAnalysisProps> = ({ moodData }) => {
     <Box>
       <Grid container spacing={3}>
         {/* 機嫌の推移グラフ */}
-        <Grid item xs={12}>
+        <Grid item xs={12} component="div">
           <Paper sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom>
               機嫌の推移
@@ -104,7 +104,7 @@ const MoodAnalysis: React.FC<MoodAnalysisProps> = ({ moodData }) => {
         </Grid>
 
         {/* 曜日別分析 */}
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={6} component="div">
           <Paper sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom>
               曜日別の機嫌傾向
@@ -131,7 +131,7 @@ const MoodAnalysis: React.FC<MoodAnalysisProps> = ({ moodData }) => {
         </Grid>
 
         {/* 統計情報 */}
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={6} component="div">
           <Paper sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom>
               統計情報
@@ -151,7 +151,7 @@ const MoodAnalysis: React.FC<MoodAnalysisProps> = ({ moodData }) => {
         </Grid>
 
         {/* アドバイス */}
-        <Grid item xs={12}>
+        <Grid item xs={12} component="div">
           <Paper sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom>
               アドバイス

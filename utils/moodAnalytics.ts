@@ -1,4 +1,4 @@
-import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay } from 'date-fns';
+import { format, eachDayOfInterval } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
 // 機嫌の平均値を計算
@@ -53,7 +53,7 @@ export const detectConsecutiveBadMoods = (
   const badMoodPeriods: { startDate: string; endDate: string; length: number }[] = [];
   let currentPeriod: { startDate: string; endDate: string; length: number } | null = null;
 
-  dates.forEach((date, index) => {
+  dates.forEach((date) => {
     if (moodData[date] <= threshold) {
       if (!currentPeriod) {
         currentPeriod = { startDate: date, endDate: date, length: 1 };
@@ -69,7 +69,7 @@ export const detectConsecutiveBadMoods = (
     }
   });
 
-  if (currentPeriod && currentPeriod.length >= minConsecutiveDays) {
+  if (currentPeriod && (currentPeriod as { length: number }).length >= minConsecutiveDays) {
     badMoodPeriods.push(currentPeriod);
   }
 
