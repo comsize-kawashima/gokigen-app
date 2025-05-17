@@ -28,15 +28,16 @@ const BottomNav: React.FC = () => {
         </svg>
       )
     },
-    {
-      path: '/add',
-      label: '追加',
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-        </svg>
-      )
-    },
+    // リリース後に対応
+    // {
+    //   path: '/add',
+    //   label: '追加',
+    //   icon: (
+    //     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    //       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+    //     </svg>
+    //   )
+    // },
     {
       path: '/analysis',
       label: '分析',
