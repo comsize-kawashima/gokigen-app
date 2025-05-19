@@ -4,6 +4,8 @@ import Layout from "@/components/layout/Layout";
 import BottomNav from "@/components/navigation/BottomNav";
 import { useRouter } from "next/router";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
 const Profile = () => {
   const { user, signOut } = useAuth();
   const [profile, setProfile] = useState<{ username: string; email: string } | null>(null);
@@ -14,7 +16,7 @@ const Profile = () => {
     const fetchProfile = async () => {
       if (!user?.token) return;
       try {
-        const res = await fetch("http://localhost:3001/api/user/find", {
+        const res = await fetch(`${API_BASE_URL}/api/user/find`, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
         const data = await res.json();

@@ -5,6 +5,8 @@ import Layout from '@/components/layout/Layout';
 import BottomNav from '@/components/navigation/BottomNav';
 import MoodAnalysis from '@/components/analysis/MoodAnalysis';
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
 const Analysis: React.FC = () => {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -20,7 +22,7 @@ const Analysis: React.FC = () => {
     const fetchMoodData = async () => {
       if (!user?.token) return;
       try {
-        const response = await fetch('http://localhost:3001/api/mood', {
+        const response = await fetch(`${API_BASE_URL}/api/mood`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
