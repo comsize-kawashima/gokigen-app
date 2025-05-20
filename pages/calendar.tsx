@@ -10,6 +10,8 @@ interface Mood {
   value: number;
 }
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
 const CalendarPage: React.FC = () => {
   const { user } = useAuth();
   const [moodData, setMoodData] = useState<{ [key: string]: number }>({});
@@ -22,7 +24,7 @@ const CalendarPage: React.FC = () => {
     const fetchMoods = async () => {
       if (!user?.token) return;
       try {
-        const res = await fetch("http://localhost:3001/api/mood", {
+        const res = await fetch(`${API_BASE_URL}/api/mood`, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
         const moods = await res.json();

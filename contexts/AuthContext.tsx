@@ -47,9 +47,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     })
     const data = await res.json()
     if (!res.ok) throw new Error(data.error || 'サインアップに失敗しました')
-    // サインアップ後に自動ログインする場合は下記を有効化
-    // localStorage.setItem('token', data.token);
-    // setUser({ token: data.token });
+    // サインアップ後に自動ログイン
+    localStorage.setItem('token', data.token);
+    setUser({ token: data.token });
   }
 
   const signOut = async () => {
