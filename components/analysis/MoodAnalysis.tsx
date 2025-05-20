@@ -220,8 +220,6 @@ const MoodAnalysis: React.FC<MoodAnalysisProps> = ({ moodData }) => {
                   maintainAspectRatio: false,
                   scales: {
                     x: {
-                      barPercentage: 0.4,
-                      categoryPercentage: 0.7,
                       grid: { color: '#ffe0b2' },
                     },
                     y: {
