@@ -43,6 +43,9 @@ const moodColors = {
   ],
 };
 
+// 追加: ポップなフォント
+const popFont = `'M PLUS Rounded 1c', 'Nunito', sans-serif`;
+
 // ReadOnlyMoodCalendarコンポーネントの定義
 const ReadOnlyMoodCalendar: FC<ReadOnlyMoodCalendarProps> = ({
   moodData,
@@ -64,16 +67,16 @@ const ReadOnlyMoodCalendar: FC<ReadOnlyMoodCalendarProps> = ({
   const monthDays = eachDayOfInterval({ start: startDate, end: endDate });
 
   return (
-    <div className="bg-white rounded-lg">
+    <div className="bg-gradient-to-br from-yellow-50 via-blue-50 to-green-50 rounded-3xl shadow-2xl p-6" style={{ fontFamily: popFont }}>
       {/* カレンダーのヘッダー */}
-      <div className="flex items-center justify-between p-4 border-b">
+      <div className="flex items-center justify-between p-6 border-b-2 border-blue-100 rounded-t-3xl">
         <div className="flex items-center space-x-4">
-          <h2 className="text-xl font-normal text-gray-900">
+          <h2 className="text-2xl font-bold text-blue-500 tracking-wider drop-shadow" style={{ fontFamily: popFont }}>
             {format(validDate, "yyyy年MM月", { locale: ja })}
           </h2>
           <button
             onClick={onTodayClick}
-            className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-md"
+            className="px-4 py-2 text-base font-bold text-white bg-blue-400 hover:bg-blue-300 rounded-full shadow transition duration-200"
           >
             今日
           </button>
@@ -81,19 +84,19 @@ const ReadOnlyMoodCalendar: FC<ReadOnlyMoodCalendarProps> = ({
         <div className="flex items-center space-x-2">
           <button
             onClick={onPrevMonth}
-            className="p-2 hover:bg-gray-100 rounded-full"
+            className="p-2 bg-blue-100 hover:bg-blue-200 rounded-full shadow transition duration-200"
             aria-label="前月"
           >
-            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
           <button
             onClick={onNextMonth}
-            className="p-2 hover:bg-gray-100 rounded-full"
+            className="p-2 bg-blue-100 hover:bg-blue-200 rounded-full shadow transition duration-200"
             aria-label="次月"
           >
-            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
@@ -101,12 +104,14 @@ const ReadOnlyMoodCalendar: FC<ReadOnlyMoodCalendarProps> = ({
       </div>
 
       {/* カレンダーグリッド */}
-      <div className="grid grid-cols-7 border-b">
+      <div className="grid grid-cols-7 border-b-2 border-blue-100">
         {/* 曜日の行 */}
         {["日", "月", "火", "水", "木", "金", "土"].map((day, index) => (
           <div
             key={index}
-            className="py-2 text-sm font-medium text-gray-500 text-center border-r last:border-r-0"
+            className={`py-5 text-base font-bold text-center border-r last:border-r-0 tracking-wide ${
+              day === "日" ? "text-orange-400" : day === "土" ? "text-blue-400" : "text-green-400"
+            }`}
           >
             {day}
           </div>
@@ -114,7 +119,7 @@ const ReadOnlyMoodCalendar: FC<ReadOnlyMoodCalendarProps> = ({
       </div>
 
       {/* 日付グリッド */}
-      <div className="grid grid-cols-7 h-[calc(100vh-16rem)]">
+      <div className="grid grid-cols-7 min-h-[400px]">
         {monthDays.map((date, index) => {
           const isSelected = isSameDay(date, validDate);
           const isToday = isDateToday(date);
@@ -124,26 +129,26 @@ const ReadOnlyMoodCalendar: FC<ReadOnlyMoodCalendarProps> = ({
           return (
             <div
               key={index}
-              className={`min-h-[100px] p-1 border-r border-b relative ${
-                !isCurrentMonth ? "bg-gray-50" : ""
-              } hover:bg-gray-50 cursor-pointer`}
+              className={`min-h-[90px] p-2 border-r border-b relative rounded-2xl transition duration-200 ${
+                !isCurrentMonth ? "bg-gray-100" : "bg-white"
+              } ${isToday ? "ring-4 ring-blue-200" : ""} ${isSelected ? "ring-4 ring-green-200" : ""} hover:bg-yellow-50 cursor-pointer`}
               onClick={() => onDateChange(date)}
             >
               <div className="flex flex-col h-full">
                 <div className="flex justify-between items-center mb-1">
                   <span
                     className={`
-                      w-8 h-8 flex items-center justify-center rounded-full text-sm
-                      ${isToday ? "bg-blue-600 text-white" : ""}
-                      ${isSelected ? "bg-gray-200" : ""}
+                      w-9 h-9 flex items-center justify-center rounded-full text-base font-bold drop-shadow
+                      ${isToday ? "bg-blue-400 text-white" : ""}
+                      ${isSelected ? "bg-green-200 text-green-700" : ""}
                       ${
                         format(date, "EEE", { locale: ja }) === "日"
-                          ? "text-red-500"
+                          ? "text-orange-400"
                           : format(date, "EEE", { locale: ja }) === "土"
-                          ? "text-blue-500"
-                          : "text-gray-900"
+                          ? "text-blue-400"
+                          : "text-green-400"
                       }
-                      ${!isCurrentMonth ? "text-gray-400" : ""}
+                      ${!isCurrentMonth ? "text-gray-300" : ""}
                     `}
                   >
                     {format(date, "d")}
@@ -151,8 +156,9 @@ const ReadOnlyMoodCalendar: FC<ReadOnlyMoodCalendarProps> = ({
                 </div>
                 {/* 機嫌の表示 */}
                 {moodIndex !== undefined && isCurrentMonth && (
-                  <div className="absolute top-10 left-1 right-1">
-                    <div className={`${moodColors.bg[moodIndex]} ${moodColors.text[moodIndex]} rounded px-2 py-1 text-sm`}>
+                  <div className="absolute top-10 left-1 right-1 flex justify-center">
+                    <div className={`rounded-full shadow-lg px-3 py-2 text-2xl font-bold flex items-center justify-center transition duration-200 ${moodColors.bg[moodIndex]} ${moodColors.text[moodIndex]}`}
+                      style={{ minWidth: 48, minHeight: 48, fontFamily: popFont }}>
                       {moods[moodIndex]}
                     </div>
                   </div>
