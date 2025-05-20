@@ -11,15 +11,11 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { Line, Bar, Doughnut } from 'react-chartjs-2';
+import { Bar, Doughnut } from 'react-chartjs-2';
 import { Box, Typography, Grid, Paper, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
 import {
-  calculateAverageMood,
-  getMoodDataForPeriod,
   calculateMoodByDayOfWeek,
-  analyzeMoodPatterns,
 } from '@/utils/moodAnalytics';
-import { format } from 'date-fns';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 ChartJS.register(
@@ -40,8 +36,11 @@ interface MoodAnalysisProps {
 }
 
 // 顔文字変換テーブル
-const moodNumToEmoji = ["😫", "😟", "😐", "🙂", "😊"];
+const moodNumToEmoji: string[] = ["😫", "😟", "😐", "🙂", "😊"];
 const moodColors = ["#b39ddb", "#90caf9", "#fff59d", "#a5d6a7", "#ffcc80"];
+
+// 追加: ポップなフォント
+const popFont = `'M PLUS Rounded 1c', 'Noto Sans JP', 'Nunito', sans-serif`;
 
 // 指定範囲で顔文字ごとにカウント
 const countMoodsByEmoji = (moodData: { [key: string]: number }, start: Date | null, end: Date | null) => {
@@ -55,9 +54,34 @@ const countMoodsByEmoji = (moodData: { [key: string]: number }, start: Date | nu
   return counts;
 };
 
+// 期間でmoodDataをフィルタリング
+const filterMoodDataByPeriod = (moodData: { [key: string]: number }, period: 'month' | 'year' | 'all', today: Date) => {
+  let start: Date | null = null;
+  let end: Date | null = null;
+  if (period === 'month') {
+    start = new Date(today.getFullYear(), today.getMonth(), 1);
+    end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+  } else if (period === 'year') {
+    start = new Date(today.getFullYear(), 0, 1);
+    end = new Date(today.getFullYear(), 11, 31);
+  }
+  if (!start || !end) return moodData;
+  const filtered: { [key: string]: number } = {};
+  Object.entries(moodData).forEach(([dateStr, value]) => {
+    const date = new Date(dateStr);
+    if (date >= start && date <= end) {
+      filtered[dateStr] = value;
+    }
+  });
+  return filtered;
+};
+
 const MoodAnalysis: React.FC<MoodAnalysisProps> = ({ moodData }) => {
   const today = new Date();
   const [period, setPeriod] = React.useState<'month' | 'year' | 'all'>('month');
+
+  // 期間でフィルタしたmoodData
+  const filteredMoodData = filterMoodDataByPeriod(moodData, period, today);
 
   // 集計範囲の決定
   let start: Date | null = null;
@@ -72,9 +96,9 @@ const MoodAnalysis: React.FC<MoodAnalysisProps> = ({ moodData }) => {
 
   // 円グラフ用データ（顔文字ごと）
   const moodCounts = countMoodsByEmoji(moodData, start, end);
-  const doughnutLabels = moodNumToEmoji;
-  const doughnutDataArr = moodNumToEmoji.map(emoji => moodCounts[emoji] || 0);
-  const doughnutColors = moodColors;
+  const doughnutLabels = [...moodNumToEmoji].reverse();
+  const doughnutDataArr = [...moodNumToEmoji].map(emoji => moodCounts[emoji] || 0).reverse();
+  const doughnutColors = [...moodColors].reverse();
   const doughnutData = {
     labels: doughnutLabels,
     datasets: [
@@ -86,53 +110,36 @@ const MoodAnalysis: React.FC<MoodAnalysisProps> = ({ moodData }) => {
     ],
   };
 
-  // 期間内のデータを取得
-  const periodData = getMoodDataForPeriod(
-    moodData,
-    start ?? today,
-    end ?? today
-  );
-
-  // グラフデータの設定
-  const lineChartData = {
-    labels: periodData.map(d => format(new Date(d.date), 'M/d')),
-    datasets: [
-      {
-        label: '機嫌の推移',
-        data: periodData.map(d => d.mood),
-        borderColor: 'rgb(75, 192, 192)',
-        tension: 0.1,
-      },
-    ],
-  };
-
-  // 曜日別データの設定
-  const dayOfWeekData = calculateMoodByDayOfWeek(moodData);
+  // 曜日別データの設定（期間でフィルタしたデータで集計）
+  const dayOfWeekData = calculateMoodByDayOfWeek(filteredMoodData);
   const barChartData = {
     labels: Object.keys(dayOfWeekData),
     datasets: [
       {
         label: '曜日別平均機嫌',
         data: Object.values(dayOfWeekData),
-        backgroundColor: 'rgba(75, 192, 192, 0.5)',
+        backgroundColor: Object.values(dayOfWeekData).map(v => moodColors[Math.round(Number(v))] ?? "#ccc"),
       },
     ],
   };
-
-  // 機嫌のパターン分析
-  const moodPatterns = analyzeMoodPatterns(moodData);
 
   return (
     <Box>
       <Grid container spacing={3}>
         {/* 機嫌の割合 円グラフ＋切り替え */}
         <Grid item xs={12} component="div">
-          <Paper sx={{ p: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h6" gutterBottom sx={{ flexGrow: 1 }}>
+          <Paper sx={{
+            p: 4,
+            borderRadius: 4,
+            boxShadow: 6,
+            background: 'linear-gradient(135deg, #fff8e1 0%, #e1f5fe 100%)',
+            mb: 4,
+          }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+              <Typography variant="h5" gutterBottom sx={{ flexGrow: 1, fontWeight: 700, fontFamily: popFont, color: '#ff9800', letterSpacing: 2 }}>
                 機嫌の割合
               </Typography>
-              <FormControl size="small" sx={{ minWidth: 120 }}>
+              <FormControl size="small" sx={{ minWidth: 120, background: '#fffde7', borderRadius: 2, boxShadow: 2 }}>
                 <InputLabel id="period-select-label">期間</InputLabel>
                 <Select
                   labelId="period-select-label"
@@ -146,120 +153,107 @@ const MoodAnalysis: React.FC<MoodAnalysisProps> = ({ moodData }) => {
                 </Select>
               </FormControl>
             </Box>
-            <Box sx={{ height: 300 }}>
+            <Box sx={{ height: 340, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <Doughnut
                 data={doughnutData}
                 options={{
                   responsive: true,
                   maintainAspectRatio: false,
                   plugins: {
-                    legend: { position: 'bottom', labels: { font: { size: 24 } } },
+                    legend: { display: false },
                     datalabels: {
                       display: true,
                       formatter: (value, context) => context.chart.data.labels?.[context.dataIndex] || '',
-                      font: { size: 32 },
+                      font: { size: 40, family: popFont },
                     },
                   },
                 }}
                 plugins={[ChartDataLabels]}
               />
             </Box>
-          </Paper>
-        </Grid>
-
-        {/* 機嫌の推移グラフ */}
-        <Grid item xs={12} component="div">
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              機嫌の推移
-            </Typography>
-            <Box sx={{ height: 300 }}>
-              <Line 
-                data={lineChartData}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  scales: {
-                    y: {
-                      min: 0,
-                      max: 4,
-                      ticks: {
-                        stepSize: 1
-                      }
-                    }
-                  }
-                }}
-              />
+            {/* カスタム凡例 */}
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+              {moodNumToEmoji.map((emoji, i) => (
+                <Box key={emoji} sx={{ display: 'flex', alignItems: 'center', mx: 2 }}>
+                  <Box sx={{ width: 32, height: 32, backgroundColor: moodColors[i], borderRadius: 2, mr: 1, boxShadow: 2 }} />
+                  <span style={{ fontSize: 32, fontFamily: popFont }}>{emoji}</span>
+                </Box>
+              ))}
             </Box>
           </Paper>
         </Grid>
 
         {/* 曜日別分析 */}
-        <Grid item xs={12} md={6} component="div">
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              曜日別の機嫌傾向
-            </Typography>
-            <Box sx={{ height: 300 }}>
+        <Grid item xs={12} component="div">
+          <Paper sx={{
+            p: 4,
+            borderRadius: 4,
+            boxShadow: 6,
+            background: 'linear-gradient(135deg, #e1f5fe 0%, #fff8e1 100%)',
+            mb: 4,
+            maxWidth: '100%',
+            width: '100%',
+          }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, width: '100%', justifyContent: 'center' }}>
+              <Typography variant="h5" gutterBottom sx={{ flexGrow: 1, textAlign: 'left', fontWeight: 700, fontFamily: popFont, color: '#00bcd4', letterSpacing: 2 }}>
+                曜日別の機嫌傾向
+              </Typography>
+              <FormControl size="small" sx={{ minWidth: 120, ml: 2, background: '#e1f5fe', borderRadius: 2, boxShadow: 2 }}>
+                <InputLabel id="period-select-label-bar">期間</InputLabel>
+                <Select
+                  labelId="period-select-label-bar"
+                  value={period}
+                  label="期間"
+                  onChange={e => setPeriod(e.target.value as 'month' | 'year' | 'all')}
+                >
+                  <MenuItem value="month">月</MenuItem>
+                  <MenuItem value="year">年</MenuItem>
+                  <MenuItem value="all">合計</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+            <Box sx={{ height: 340, width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <Bar 
                 data={barChartData}
                 options={{
                   responsive: true,
                   maintainAspectRatio: false,
                   scales: {
+                    x: {
+                      barPercentage: 0.4,
+                      categoryPercentage: 0.7,
+                      grid: { color: '#ffe0b2' },
+                    },
                     y: {
                       min: 0,
                       max: 4,
                       ticks: {
-                        stepSize: 1
-                      }
-                    }
-                  }
+                        stepSize: 1,
+                        callback: (value) => moodNumToEmoji[Number(value)] ?? value,
+                        font: { size: 24, family: popFont },
+                      },
+                      grid: { color: '#b2ebf2' },
+                    },
+                  },
+                  plugins: {
+                    datalabels: {
+                      display: true,
+                      formatter: (value) => moodNumToEmoji[Math.round(Number(value))] ?? value,
+                      font: { size: 36, family: popFont },
+                    },
+                    tooltip: {
+                      callbacks: {
+                        label: (context) => {
+                          const v = context.parsed.y;
+                          return moodNumToEmoji[Math.round(Number(v))] ?? v;
+                        },
+                      },
+                    },
+                  },
                 }}
+                plugins={[ChartDataLabels]}
               />
             </Box>
-          </Paper>
-        </Grid>
-
-        {/* 統計情報 */}
-        <Grid item xs={12} md={6} component="div">
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              統計情報
-            </Typography>
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="body1" gutterBottom>
-                平均機嫌: {calculateAverageMood(moodData).toFixed(2)}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                機嫌の変動性: {moodPatterns.moodVariability.toFixed(2)}
-              </Typography>
-              <Typography variant="body1">
-                改善傾向: {moodPatterns.improvementTrend ? 'あり' : 'なし'}
-              </Typography>
-            </Box>
-          </Paper>
-        </Grid>
-
-        {/* アドバイス */}
-        <Grid item xs={12} component="div">
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              アドバイス
-            </Typography>
-            <Typography variant="body1">
-              {moodPatterns.improvementTrend
-                ? '機嫌の改善傾向が見られます。現在の生活習慣を維持しましょう。'
-                : '以下のような改善を試してみてください：'}
-            </Typography>
-            {!moodPatterns.improvementTrend && (
-              <Box component="ul" sx={{ mt: 1 }}>
-                <li>十分な睡眠を取る</li>
-                <li>適度な運動を行う</li>
-                <li>趣味の時間を確保する</li>
-                <li>友人や家族と過ごす時間を増やす</li>
-              </Box>
-            )}
           </Paper>
         </Grid>
       </Grid>
