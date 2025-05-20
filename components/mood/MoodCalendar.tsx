@@ -50,6 +50,9 @@ const moodColors = {
   ],
 };
 
+// 追加: ポップなフォント
+const popFont = `'M PLUS Rounded 1c', 'Nunito', sans-serif`;
+
 // MoodCalendarコンポーネントの定義
 const MoodCalendar: FC<MoodCalendarProps> = ({
   moodData,
@@ -100,27 +103,45 @@ const MoodCalendar: FC<MoodCalendarProps> = ({
   };
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-6">
+    <div className="bg-gradient-to-br from-yellow-50 via-blue-50 to-green-50 rounded-3xl shadow-2xl p-8" style={{ fontFamily: popFont }}>
+      {/* 機嫌を選択するボタン（上部に移動） */}
+      <div className="mb-6 flex flex-col items-center">
+        <h3 className="text-2xl font-bold text-blue-400 mb-3 tracking-wide" style={{ fontFamily: popFont, letterSpacing: 2 }}>
+          機嫌を選択してください
+        </h3>
+        <div className="flex justify-center space-x-4 mt-2">
+          {moods.map((mood, index) => (
+            <button
+              key={index}
+              onClick={() => handleMoodSelect(validDate, index)}
+              className={`text-4xl p-3 rounded-full shadow-lg transition-all hover:scale-125 focus:scale-110 focus:outline-none border-2 border-transparent hover:border-green-300 ${moodColors.button[index]}`}
+              style={{ background: '#fff', fontFamily: popFont }}
+            >
+              {mood}
+            </button>
+          ))}
+        </div>
+      </div>
       {/* カレンダーのタイトル */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-6">
         <button
           onClick={handlePrevMonth}
-          className="p-2 hover:bg-gray-100 rounded-full"
+          className="p-2 bg-blue-100 hover:bg-blue-200 rounded-full shadow transition duration-200"
           aria-label="前月"
         >
-          <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <h2 className="text-xl font-semibold text-gray-700">
+        <h2 className="text-2xl font-bold text-green-500 tracking-wider drop-shadow" style={{ fontFamily: popFont }}>
           {format(validDate, "yyyy年MM月", { locale: ja })}
         </h2>
         <button
           onClick={handleNextMonth}
-          className="p-2 hover:bg-gray-100 rounded-full"
+          className="p-2 bg-blue-100 hover:bg-blue-200 rounded-full shadow transition duration-200"
           aria-label="次月"
         >
-          <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>
@@ -130,7 +151,9 @@ const MoodCalendar: FC<MoodCalendarProps> = ({
       <div className="grid grid-cols-7 gap-1">
         {/* 曜日を表示 */}
         {["日", "月", "火", "水", "木", "金", "土"].map((day, index) => (
-          <div key={index} className="text-center font-medium text-gray-600">
+          <div key={index} className={`text-center font-bold text-lg py-3 tracking-wide ${
+            day === "日" ? "text-orange-400" : day === "土" ? "text-blue-400" : "text-green-400"
+          }`} style={{ fontFamily: popFont }}>
             {day}
           </div>
         ))}
@@ -145,47 +168,33 @@ const MoodCalendar: FC<MoodCalendarProps> = ({
           if (format(date, "EEE", { locale: ja }) === "土")
             dayColor = "text-blue-600";
           if (format(date, "EEE", { locale: ja }) === "日")
-            dayColor = "text-red-600";
+            dayColor = "text-orange-400";
 
           return (
             <div key={index} className="flex flex-col items-center">
               <button
                 onClick={() => onDateChange(date)}
-                className={`w-12 h-12 p-3 rounded-lg transition-colors flex items-center justify-center ${
+                className={`w-12 h-12 p-3 rounded-2xl transition-colors flex items-center justify-center shadow-sm font-bold text-lg ${
                   isSelected
-                    ? "bg-emerald-500 text-white"
-                    : `hover:bg-gray-100 ${isCurrentMonth ? dayColor : "text-gray-400"}`
-                } ${isToday && !isSelected ? "ring-2 ring-emerald-400" : ""}`}
+                    ? "bg-green-400 text-white"
+                    : `hover:bg-yellow-100 ${isCurrentMonth ? dayColor : "text-gray-300"}`
+                } ${isToday && !isSelected ? "ring-2 ring-blue-300" : ""}`}
+                style={{ fontFamily: popFont }}
               >
-                <span className="text-xl font-medium">{format(date, "d")}</span>
+                <span className="text-xl font-bold">
+                  {format(date, "d")}
+                </span>
               </button>
               {/* 選択された機嫌を表示 */}
               {moodIndex !== undefined && (
-                <span className={`mt-1 text-2xl font-bold ${moodColors.text[moodIndex]}`}>
+                <span className={`mt-2 text-3xl font-bold rounded-full shadow-lg px-3 py-2 bg-white ${moodColors.text[moodIndex]}`}
+                  style={{ fontFamily: popFont, minWidth: 48, minHeight: 48, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
                   {moods[moodIndex]}
                 </span>
               )}
             </div>
           );
         })}
-      </div>
-
-      {/* 機嫌を選択するボタン */}
-      <div className="mt-4">
-        <h3 className="text-center text-sm text-gray-600">
-          機嫌を選択してください
-        </h3>
-        <div className="flex justify-center space-x-2 mt-2">
-          {moods.map((mood, index) => (
-            <button
-              key={index}
-              onClick={() => handleMoodSelect(validDate, index)}
-              className={`text-3xl p-2 rounded-full transition-all hover:scale-110 ${moodColors.button[index]}`}
-            >
-              {mood}
-            </button>
-          ))}
-        </div>
       </div>
     </div>
   );
