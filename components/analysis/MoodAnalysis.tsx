@@ -6,20 +6,21 @@ import {
   PointElement,
   LineElement,
   BarElement,
+  ArcElement,
   Title,
   Tooltip,
   Legend,
 } from 'chart.js';
-import { Line, Bar } from 'react-chartjs-2';
-import { Box, Typography, Grid, Paper } from '@mui/material';
+import { Line, Bar, Doughnut } from 'react-chartjs-2';
+import { Box, Typography, Grid, Paper, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
 import {
   calculateAverageMood,
   getMoodDataForPeriod,
   calculateMoodByDayOfWeek,
   analyzeMoodPatterns,
 } from '@/utils/moodAnalytics';
-import { format, startOfWeek, endOfWeek } from 'date-fns';
-import { ja } from 'date-fns/locale';
+import { format } from 'date-fns';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 ChartJS.register(
   CategoryScale,
@@ -27,22 +28,70 @@ ChartJS.register(
   PointElement,
   LineElement,
   BarElement,
+  ArcElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  ChartDataLabels
 );
 
 interface MoodAnalysisProps {
   moodData: { [key: string]: number };
 }
 
+// 顔文字変換テーブル
+const moodNumToEmoji = ["😫", "😟", "😐", "🙂", "😊"];
+const moodColors = ["#b39ddb", "#90caf9", "#fff59d", "#a5d6a7", "#ffcc80"];
+
+// 指定範囲で顔文字ごとにカウント
+const countMoodsByEmoji = (moodData: { [key: string]: number }, start: Date | null, end: Date | null) => {
+  const counts: { [emoji: string]: number } = {};
+  Object.entries(moodData).forEach(([dateStr, value]) => {
+    const date = new Date(dateStr);
+    if ((start && date < start) || (end && date > end)) return;
+    const emoji = moodNumToEmoji[value] ?? "?";
+    counts[emoji] = (counts[emoji] || 0) + 1;
+  });
+  return counts;
+};
+
 const MoodAnalysis: React.FC<MoodAnalysisProps> = ({ moodData }) => {
   const today = new Date();
-  const startDate = startOfWeek(today, { locale: ja });
-  const endDate = endOfWeek(today, { locale: ja });
+  const [period, setPeriod] = React.useState<'month' | 'year' | 'all'>('month');
+
+  // 集計範囲の決定
+  let start: Date | null = null;
+  let end: Date | null = null;
+  if (period === 'month') {
+    start = new Date(today.getFullYear(), today.getMonth(), 1);
+    end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+  } else if (period === 'year') {
+    start = new Date(today.getFullYear(), 0, 1);
+    end = new Date(today.getFullYear(), 11, 31);
+  }
+
+  // 円グラフ用データ（顔文字ごと）
+  const moodCounts = countMoodsByEmoji(moodData, start, end);
+  const doughnutLabels = moodNumToEmoji;
+  const doughnutDataArr = moodNumToEmoji.map(emoji => moodCounts[emoji] || 0);
+  const doughnutColors = moodColors;
+  const doughnutData = {
+    labels: doughnutLabels,
+    datasets: [
+      {
+        data: doughnutDataArr,
+        backgroundColor: doughnutColors,
+        borderWidth: 1,
+      },
+    ],
+  };
 
   // 期間内のデータを取得
-  const periodData = getMoodDataForPeriod(moodData, startDate, endDate);
+  const periodData = getMoodDataForPeriod(
+    moodData,
+    start ?? today,
+    end ?? today
+  );
 
   // グラフデータの設定
   const lineChartData = {
@@ -76,6 +125,48 @@ const MoodAnalysis: React.FC<MoodAnalysisProps> = ({ moodData }) => {
   return (
     <Box>
       <Grid container spacing={3}>
+        {/* 機嫌の割合 円グラフ＋切り替え */}
+        <Grid item xs={12} component="div">
+          <Paper sx={{ p: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6" gutterBottom sx={{ flexGrow: 1 }}>
+                機嫌の割合
+              </Typography>
+              <FormControl size="small" sx={{ minWidth: 120 }}>
+                <InputLabel id="period-select-label">期間</InputLabel>
+                <Select
+                  labelId="period-select-label"
+                  value={period}
+                  label="期間"
+                  onChange={e => setPeriod(e.target.value as 'month' | 'year' | 'all')}
+                >
+                  <MenuItem value="month">月</MenuItem>
+                  <MenuItem value="year">年</MenuItem>
+                  <MenuItem value="all">合計</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+            <Box sx={{ height: 300 }}>
+              <Doughnut
+                data={doughnutData}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: { position: 'bottom', labels: { font: { size: 24 } } },
+                    datalabels: {
+                      display: true,
+                      formatter: (value, context) => context.chart.data.labels?.[context.dataIndex] || '',
+                      font: { size: 32 },
+                    },
+                  },
+                }}
+                plugins={[ChartDataLabels]}
+              />
+            </Box>
+          </Paper>
+        </Grid>
+
         {/* 機嫌の推移グラフ */}
         <Grid item xs={12} component="div">
           <Paper sx={{ p: 2 }}>
