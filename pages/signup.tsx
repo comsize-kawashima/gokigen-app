@@ -3,6 +3,9 @@ import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import Layout from '@/components/layout/Layout'
 
+// 追加: ポップなフォント
+const popFont = `'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif`;
+
 const SignUp = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -25,12 +28,12 @@ const SignUp = () => {
 
   return (
     <Layout title="サインアップ">
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-yellow-50 via-blue-50 to-green-50 rounded-3xl shadow-2xl" style={{ fontFamily: popFont }}>
         <form
           onSubmit={handleSubmit}
-          className="bg-white p-6 rounded shadow-md w-full max-w-sm"
+          className="bg-white p-6 rounded-3xl shadow-lg w-full max-w-sm"
         >
-          <h2 className="text-2xl font-bold mb-4">サインアップ</h2>
+          <h2 className="text-2xl font-bold mb-4" style={{ fontFamily: popFont }}>サインアップ</h2>
           {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
           <div className="mb-4">
             <label htmlFor="username" className="block text-sm font-medium mb-1">
@@ -73,7 +76,7 @@ const SignUp = () => {
           </div>
           <button
             type="submit"
-            className="w-full bg-emerald-500 text-white py-2 px-4 rounded-md hover:bg-emerald-600 transition"
+            className="w-full bg-emerald-500 text-white py-2 px-4 rounded-md hover:bg-emerald-600 shadow-md transition"
           >
             サインアップ
           </button>
