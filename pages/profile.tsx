@@ -6,6 +6,9 @@ import { useRouter } from "next/router";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
+// 追加: ポップなフォント
+const popFont = `'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif`;
+
 const Profile = () => {
   const { user, signOut } = useAuth();
   const [profile, setProfile] = useState<{ username: string; email: string } | null>(null);
@@ -39,16 +42,16 @@ const Profile = () => {
 
   return (
     <Layout title="プロフィール">
-      <div className="max-w-md mx-auto px-4 py-6">
-        <h2 className="text-2xl font-bold mb-4 shadow text-gray-700">プロフィール</h2>
+      <div className="max-w-md mx-auto px-4 py-6 bg-gradient-to-br from-yellow-50 via-blue-50 to-green-50 rounded-3xl shadow-2xl" style={{ fontFamily: popFont }}>
+        <h2 className="text-2xl font-bold mb-4 text-gray-700" style={{ fontFamily: popFont }}>プロフィール</h2>
         {error && <p className="text-red-500 mb-4">{error}</p>}
         {profile ? (
-          <div className="bg-white p-6 rounded shadow text-gray-700">
+          <div className="bg-white p-6 rounded-3xl shadow-lg text-gray-700">
             <p><span className="font-semibold">ユーザー名：</span>{profile.username}</p>
             <p><span className="font-semibold">メールアドレス：</span>{profile.email}</p>
             <button
               onClick={handleLogout}
-              className="mt-6 w-full bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 transition"
+              className="mt-6 w-full bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 shadow-md transition"
             >
               ログアウト
             </button>
