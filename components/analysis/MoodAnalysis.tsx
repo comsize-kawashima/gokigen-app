@@ -42,6 +42,10 @@ const moodColors = ["#b39ddb", "#90caf9", "#fff59d", "#a5d6a7", "#ffcc80"];
 // 追加: ポップなフォント
 const popFont = `'M PLUS Rounded 1c', 'Noto Sans JP', 'Nunito', sans-serif`;
 
+// 分析画面の機嫌マークのサイズを調整
+const iconSize = 24; // 例: 24pxに設定
+const iconMargin = 0.25; // マージンをさらに調整
+
 // 指定範囲で顔文字ごとにカウント
 const countMoodsByEmoji = (moodData: { [key: string]: number }, start: Date | null, end: Date | null) => {
   const counts: { [emoji: string]: number } = {};
@@ -175,8 +179,8 @@ const MoodAnalysis: React.FC<MoodAnalysisProps> = ({ moodData }) => {
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
               {moodNumToEmoji.map((emoji, i) => (
                 <Box key={emoji} sx={{ display: 'flex', alignItems: 'center', mx: 2 }}>
-                  <Box sx={{ width: 32, height: 32, backgroundColor: moodColors[i], borderRadius: 2, mr: 1, boxShadow: 2 }} />
-                  <span style={{ fontSize: 32, fontFamily: popFont }}>{emoji}</span>
+                  <Box sx={{ width: iconSize, height: iconSize, backgroundColor: moodColors[i], borderRadius: '50%', mr: iconMargin, boxShadow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }} />
+                  <span style={{ fontSize: iconSize, fontFamily: popFont, display: 'flex', justifyContent: 'center', alignItems: 'center', marginRight: iconMargin, overflow: 'hidden' }}>{emoji}</span>
                 </Box>
               ))}
             </Box>
